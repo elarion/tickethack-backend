@@ -25,37 +25,6 @@ async function isCartExists(req, res, next) {
 
     next();
 }
-
-// function areFieldsExistForSave(req, res, next) {
-//     const requiredFields = ['tripID', 'bookingID'];
-//     const errors = [];
-
-//     requiredFields.forEach(field => {
-//         if (!req.body[field]) {
-//             errors.push({ [field]: `The field ${field} is required in body.` });
-//         }
-//     });
-
-//     if (errors.length > 0) {
-//         return res.status(400).json({ success: false, messages: errors });
-//     }
-
-//     next();
-// }
-
-// async function isBookingExists(req, res, next) {
-//     if (!req.params.bookingID) {
-//         return res.json({ result: false, message: 'Missing bookingID field in params' });
-//     }
-
-//     const exist = await Booking.exists({ _id: req.params.bookingID });
-
-//     if (exist === null) {
-//         return res.json({ result: false, message: 'Booking does not exist' });
-//     }
-
-//     next();
-// }
 /** END OF Middleware */
 
 /** Routes */
@@ -97,22 +66,6 @@ router.post('/save', isCartExists, async (req, res, next) => {
     }
 });
 /** END OF Route POST /save */
-
-
-/** Route DELETE /delete/:bookingID */
-// router.delete('/delete/:bookingID', isBookingExists, async (req, res, next) => {
-//     const { bookingID } = req.params;
-
-//     try {
-//         await Booking.deleteOne({ '_id': bookingID });
-
-//         return res.json({ result: true, message: 'Booking deleted' });
-//     } catch (e) {
-//         console.error('Error With Route DELETE bookings/delete/:bookingID =>', e);
-//         return res.json({ result: false, message: e.message });
-//     }
-// });
-/** END OF Route POST /delete/:bookingID */
 /** END OF Routes */
 
 module.exports = router;

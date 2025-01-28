@@ -4,13 +4,13 @@ const router = express.Router();
 const Cart = require('../models/carts');
 
 /** Middleware */
-function isCartIDFieldExists(req, res, next) {
-    if (!req.query.cartID) {
-        return res.json({ result: false, message: 'Missing cartID field in params' });
-    }
+// function isCartIDFieldExists(req, res, next) {
+//     if (!req.query.cartID) {
+//         return res.json({ result: false, message: 'Missing cartID field in params' });
+//     }
 
-    next();
-}
+//     next();
+// }
 
 function areFieldsExistForSave(req, res, next) {
     const requiredFields = ['tripID', 'cartID'];
@@ -46,13 +46,18 @@ async function isCartExists(req, res, next) {
 
 /** Routes */
 /** Route GET /all */
-router.get('/', isCartIDFieldExists, async (req, res, next) => {
+router.get('/', async (req, res, next) => {
     const { cartID } = req.query;
 
     try {
-        const carts = await Cart.findById(cartID).populate('trips');
+        if (cartID === undefined) {
+            const cart = await Cart.findOne().populate('trips');
+            return res.json({ result: true, cart: cart });
+        }
 
-        return res.json({ result: true, carts: carts });
+        const cart = await Cart.findById(cartID).populate('trips');
+
+        return res.json({ result: true, cart: cart });
     } catch (e) {
         console.error('Error With Route GET /carts =>', e);
         return res.json({ result: false, message: e.message });
@@ -72,13 +77,15 @@ router.post('/save', areFieldsExistForSave, async (req, res, next) => {
             { upsert: true, new: true }
         );
         // return res.redirect('./cart.html');
-        return res.json({ result: true, message: 'Trip added to cart' });
+        return res.json({ result: true, message: 'Trip added to cart', redirect: `/cart.html?cartID=${cart._id}` });
     } catch (e) {
         console.error('Error With Route POST /carts/save =>', e);
         return res.json({ result: false, message: e.message });
     }
 });
 /** END OF Route POST /save */
+
+
 
 
 /** Route DELETE /delete/:cartID */
