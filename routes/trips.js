@@ -47,7 +47,10 @@ router.post('/search', validateSearchFields,  async (req, res, next) => {
             }
         });
 
-        trips = trips.map(trip => trip.date = getHoursFromDate(trip.date));
+        trips = trips.map(trip => {
+            trip.date = getHoursFromDate(trip.date);
+            return trip;
+        });
 
         return res.json({ result: true, trips: trips });
     } catch (e) {
