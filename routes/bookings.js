@@ -59,7 +59,7 @@ router.post('/save', isCartExists, async (req, res, next) => {
         await cart.deleteOne();
 
         // return res.redirect('./booking.html');
-        return res.json({ result: true, message: 'Booking saved' });
+        return res.json({ result: true, message: 'Booking saved'});
     } catch (e) {
         console.error('Error With Route POST bookings/save =>', e);
         return res.json({ result: false, message: e.message });
