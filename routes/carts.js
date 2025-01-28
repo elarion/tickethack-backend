@@ -6,13 +6,6 @@ const Cart = require('../models/carts');
 const { getHoursFromDate } = require('../modules/helpers');
 
 /** Middleware */
-// function isCartIDFieldExists(req, res, next) {
-//     if (!req.query.cartID) {
-//         return res.json({ result: false, message: 'Missing cartID field in params' });
-//     }
-
-//     next();
-// }
 
 function areFieldsExistForSave(req, res, next) {
     const requiredFields = ['tripID', 'cartID'];
@@ -49,16 +42,14 @@ async function isCartExists(req, res, next) {
 /** Routes */
 /** Route GET /all */
 router.get('/', async (req, res, next) => {
-    const { cartID } = req.query;
+    // const { cartID } = req.query;
 
     try {
-        let cart = {};
-
-        if (cartID === undefined) {
-            cart = await Cart.findOne().populate('trips').lean();
-        } else {
-            cart = await Cart.findById(cartID).populate('trips').lean();
-        }
+        // if (cartID === undefined) {
+        const cart = await Cart.findOne({}).populate('trips').lean();
+        // } else {
+            // cart = await Cart.findById(cartID).populate('trips').lean();
+        // }
 
         if (cart === null) {
             return res.json({ result: false, cart: {} });
@@ -81,11 +72,16 @@ router.get('/', async (req, res, next) => {
 /** Route POST /save */
 router.post('/save', areFieldsExistForSave, async (req, res, next) => {
     const { tripID, cartID } = req.body;
-    const query = cartID !== '0' ? { _id: cartID } : {};
+    // const query = cartID !== '0' ? { _id: cartID } : {};
 
     try {
+        // const cart = await Cart.findOneAndUpdate(
+        //     { $addToSet: { trips: tripID } },
+        //     { upsert: true, new: true }
+        // );
+
         const cart = await Cart.findOneAndUpdate(
-            query,
+            {},
             { $addToSet: { trips: tripID } },
             { upsert: true, new: true }
         );
@@ -112,11 +108,8 @@ router.delete('/delete/:cartID/:tripID', isCartExists, async (req, res, next) =>
             { new: true } 
         );
 
-        console.log('updatedCartDeleteTrip...');
-
         if (updatedCart.trips.length === 0) {
             await Cart.findByIdAndDelete(cartID);
-            console.log('deletedCart...');
             return res.json({ result: true, message: 'Cart deleted because it is empty' });
         }
 
