@@ -69,15 +69,16 @@ router.get('/', async (req, res, next) => {
 /** Route POST /save */
 router.post('/save', areFieldsExistForSave, async (req, res, next) => {
     const { tripID, cartID } = req.body;
+    const query = cartID !== '0' ? { _id: cartID } : {};
 
     try {
         const cart = await Cart.findOneAndUpdate(
-            { _id: cartID },
+            query,
             { $addToSet: { trips: tripID } },
             { upsert: true, new: true }
         );
-        // return res.redirect('./cart.html');
-        return res.json({ result: true, message: 'Trip added to cart', redirect: `/cart.html?cartID=${cart._id}` });
+
+        return res.json({ result: true, cartID: cart._id});
     } catch (e) {
         console.error('Error With Route POST /carts/save =>', e);
         return res.json({ result: false, message: e.message });

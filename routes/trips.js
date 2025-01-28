@@ -38,16 +38,16 @@ router.post('/search', validateSearchFields,  async (req, res, next) => {
     const dateRange = formatDateForSearch(date);
 
     try {
-        const trips = await Trip.find({
+        let trips = await Trip.find({
             departure: { '$regex': arrival, $options: 'i' },
             arrival:  { '$regex': departure, $options: 'i' },
-            arrival: arrival,
-            departure: departure,
             date: {
                 $gte: dateRange[0],
                 $lte: dateRange[1]
             }
         });
+
+        trips = trips.map(trip => trip.date = getHoursFromDate(trip.date));
 
         return res.json({ result: true, trips: trips });
     } catch (e) {
