@@ -6,8 +6,8 @@ function getHoursFromDate(date) {
 
 function formatDateForSearch(date) {
     return [
-        moment(date, 'DD/MM/YYYY').format(),
-        moment(date, 'DD/MM/YYYY').endOf('day').format()
+        moment(date, 'YYYY-MM-DD').format(),
+        moment(date, 'YYYY-MM-DD').endOf('day').format()
     ];
 }
 
