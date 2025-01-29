@@ -1,9 +1,13 @@
 const moment = require('moment');
 
+// Get hours from date using moment.js
 function getHoursFromDate(date) {
+    // Get the current date as a moment object
     const now = moment();
+    // Get the date from the parameter and convert it to a moment object
     date = moment(date);
 
+    // If the date is the same as the current date, return the hours and minutes else return the full date
     return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('DD MMMM YYYY HH[h]mm');
 }
 
