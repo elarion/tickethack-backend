@@ -4,7 +4,7 @@ function getHoursFromDate(date) {
     const now = moment();
     date = moment(date);
 
-    return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('DD MMMM YYYY à HH[h]mm');
+    return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('DD MMMM YYYY HH[h]mm');
 }
 
 function formatDateForSearch(date) {
