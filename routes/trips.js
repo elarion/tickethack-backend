@@ -39,8 +39,8 @@ router.post('/search', validateSearchFields,  async (req, res, next) => {
 
     try {
         let trips = await Trip.find({
-            departure: { '$regex': arrival, $options: 'i' },
-            arrival:  { '$regex': departure, $options: 'i' },
+            departure: { '$regex': departure, $options: 'i' },
+            arrival:  { '$regex': arrival, $options: 'i' },
             date: {
                 $gte: dateRange[0],
                 $lte: dateRange[1]
