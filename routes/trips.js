@@ -14,17 +14,14 @@ const validateSearchFields = (req, res, next) => {
     const requiredFields = ['arrival', 'departure', 'date'];
     const errors = [];
 
-    // Loop through required fields
     requiredFields.forEach(field => {
-        // If the field is not in the request body, add an error message
-        if (!Object.hasOwn(req.body, field)) {
+        if (!req.body[field]) {
             errors.push({[field] : `The field ${field} is required in body.`});
         }
     });
 
-    // If errors array is not empty, return the errors
     if (errors.length > 0) {
-        return res.status(400).json({ result: false, messages : errors });
+        return res.status(400).json({ success: false, messages : errors });
     }
 
     next();
