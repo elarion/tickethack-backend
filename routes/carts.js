@@ -2,27 +2,27 @@ const express = require('express');
 const router = express.Router();
 
 const Cart = require('../models/carts');
+const Trip = require('../models/trips');
 
 const { getHoursFromDate } = require('../modules/helpers');
 
 /** Middleware */
 
-// function areFieldsExistForSave(req, res, next) {
-//     const requiredFields = ['tripID'];
-//     const errors = [];
+async function isTripValid(req, res, next) {
+    const { tripID } = req.body;
 
-//     requiredFields.forEach(field => {
-//         if (!req.body[field]) {
-//             errors.push({ [field]: `The field ${field} is required in body.` });
-//         }
-//     });
+    if (!tripID) {
+        return res.status(400).json({ result: false, messages: `The field tripID is required in body.` });
+    }
 
-//     if (errors.length > 0) {
-//         return res.status(400).json({ success: false, messages: errors });
-//     }
+    const trip = await Trip.findById(tripID);
 
-//     next();
-// }
+    if (tripID === null) {
+        return res.status(400).json({ result: false, messages: `The trip does not exist.` });
+    }
+
+    next();
+}
 
 async function isCartExists(req, res, next) {
     // if (!req.params.cartID) {
@@ -65,13 +65,8 @@ router.get('/', async (req, res, next) => {
 
 
 /** Route POST /save */
-router.post('/save', async (req, res, next) => {
-    const { tripID } = req.body;
-
-    if (!tripID) {
-        return res.status(400).json({ success: false, messages: `The field tripID is required in body.` });
-    }
-
+router.post('/save', isTripValid, async (req, res, next) => {
+    const {tripID} = req.body;
     try {
         const cart = await Cart.findOneAndUpdate(
             {},
