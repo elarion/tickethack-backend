@@ -25,11 +25,11 @@ const { getHoursFromDate } = require('../modules/helpers');
 // }
 
 async function isCartExists(req, res, next) {
-    if (!req.params.cartID) {
-        return res.json({ result: false, message: 'Missing cartID field in params' });
-    }
+    // if (!req.params.cartID) {
+    //     return res.json({ result: false, message: 'Missing cartID field in params' });
+    // }
 
-    const exist = await Cart.exists({_id : req.params.cartID});
+    const exist = await Cart.findOne({});
 
     if (exist === null) {
         return res.json({ result: false, message: 'Cart does not exist' });
@@ -91,12 +91,12 @@ router.post('/save', async (req, res, next) => {
 
 
 /** Route DELETE /delete/:cartID */
-router.delete('/delete/:cartID/:tripID', isCartExists, async (req, res, next) => {
+router.delete('/delete/:tripID', isCartExists, async (req, res, next) => {
     const { cartID, tripID } = req.params;
 
     try {
-        const updatedCart = await Cart.findByIdAndUpdate(
-            cartID,
+        const updatedCart = await Cart.findOneAndUpdate(
+            {},
             { $pull: { trips: tripID } },
             { new: true } 
         );
