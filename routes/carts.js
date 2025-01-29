@@ -55,10 +55,9 @@ router.get('/', async (req, res, next) => {
             return res.json({ result: false, cart: {} });
         }
 
-        cart.trips = cart.trips.map(trip => {
-            trip.date = getHoursFromDate(trip.date);
-            return trip;
-        })
+       for (const trip of cart.trips) {
+            trip.hours = getHoursFromDate(trip.date);
+        }
 
         return res.json({ result: true, cart: cart });
     } catch (e) {

@@ -47,10 +47,9 @@ router.post('/search', validateSearchFields,  async (req, res, next) => {
             }
         }).lean();
 
-        trips = await trips.map(trip => {
+        for (const trip of trips) {
             trip.hours = getHoursFromDate(trip.date);
-            return trip;
-        });
+        }
 
         return res.json({ result: trips.length > 0, trips: trips });
     } catch (e) {
