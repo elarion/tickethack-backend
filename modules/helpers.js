@@ -1,7 +1,10 @@
 const moment = require('moment');
 
 function getHoursFromDate(date) {
-    return moment(date).format('HH:mm');
+    const now = moment();
+    date = moment(date);
+
+    return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('DD MMMM YYYY à HH[h]mm');
 }
 
 function formatDateForSearch(date) {
@@ -11,4 +14,11 @@ function formatDateForSearch(date) {
     ];
 }
 
-module.exports = { getHoursFromDate, formatDateForSearch }
+function formatDateForBookings(date) {
+    const now = moment();
+    date = moment(date);
+
+    return date.isAfter(now) ? `Departure in ${date.fromNow(true)}` : `Train is gone`;
+}
+
+module.exports = { getHoursFromDate, formatDateForSearch, formatDateForBookings }
