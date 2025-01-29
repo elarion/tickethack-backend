@@ -3,7 +3,7 @@ const router = express.Router();
 
 const Booking = require('../models/bookings');
 const Cart = require('../models/carts');
-const { formatDateForBookings, getHoursFromDate } = require('../modules/helpers');
+// const { formatDateForBookings, getHoursFromDate } = require('../modules/helpers');
 
 /** Middleware */
 // function isBookingIDFieldExists(req, res, next) {
@@ -34,24 +34,82 @@ async function isCartExists(req, res, next) {
 //     const { bookingID } = req.query;
 router.get('/', async (req, res, next) => {
     try {
-        const bookings = await Booking.find().populate('trips').lean();
+        const trips = await Booking.aggregate([
+            {
+                $lookup: {
+                    from: 'trips',
+                    localField: 'trips',
+                    foreignField: '_id',
+                    as: 'trips'
+                }
+            },
+            { $unwind: "$trips" }, 
+            {
+                $set: {
+                    "trips.timeDiff": { $divide: [{ $subtract: ["$trips.date", new Date()] }, 3600000] }
+                }
+            },
+            {
+                $set: {
+                    "trips.timeLeft": {
+                        $switch: {
+                            branches: [
+                                {
+                                    case: { $lt: ["$trips.timeDiff", 0] },
+                                    then: "Train is gone"
+                                },
+                                {
+                                    case: { $lt: ["$trips.timeDiff", 24] },
+                                    then: {
+                                        $concat: [
+                                            "Départ dans ", { $toString: { $floor: "$trips.timeDiff" } }, " heures"
+                                        ]
+                                    }
+                                }
+                            ],
+                            default: {
+                                $concat: [
+                                    "Departure in ", { $toString: { $floor: { $divide: ["$trips.timeDiff", 24] } } }, " days"
+                                ]
+                            }
+                        }
+                    },
+                    "trips.hours": {
+                        $dateToString: { format: "%Hh%M", date: "$trips.date", timezone: "Europe/Paris" }
+                    }
+                }
+            },
+            { $replaceRoot: { newRoot: "$trips" } }
+        ]);
 
-        for (const booking of bookings) {
-            booking.trips = booking.trips.map(trip => {
-                trip.timeLeft   = formatDateForBookings(trip.date);
-                trip.hours      = getHoursFromDate(trip.date);
-                return trip;
-            });
-        }
+        return res.json({ result: trips.length > 0, trips });
 
-        // console.log(bookings);
-
-        return res.json({ result: bookings.length > 0, bookings: bookings });
     } catch (e) {
         console.error('Error With Route GET /bookings =>', e);
         return res.json({ result: false, message: e.message });
     }
 });
+
+// router.get('/', async (req, res, next) => {
+//     try {
+//         const bookings = await Booking.find().populate('trips').lean();
+
+//         for (const booking of bookings) {
+//             booking.trips = booking.trips.map(trip => {
+//                 trip.timeLeft   = formatDateForBookings(trip.date);
+//                 trip.hours      = getHoursFromDate(trip.date);
+//                 return trip;
+//             });
+//         }
+
+//         // console.log(bookings);
+
+//         return res.json({ result: bookings.length > 0, bookings: bookings });
+//     } catch (e) {
+//         console.error('Error With Route GET /bookings =>', e);
+//         return res.json({ result: false, message: e.message });
+//     }
+// });
 /** END OF Route GET /all */
 
 
