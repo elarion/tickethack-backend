@@ -87,7 +87,7 @@ router.post('/save', isTripValid, async (req, res, next) => {
 
 /** Route DELETE /delete/:cartID */
 router.delete('/delete/:tripID', isCartExists, async (req, res, next) => {
-    const { cartID, tripID } = req.params;
+    const { tripID } = req.params;
 
     try {
         const updatedCart = await Cart.findOneAndUpdate(
@@ -97,7 +97,7 @@ router.delete('/delete/:tripID', isCartExists, async (req, res, next) => {
         );
 
         if (updatedCart.trips.length === 0) {
-            await Cart.findByIdAndDelete(cartID);
+            await updatedCart.deleteOne();
             return res.json({ result: true, message: 'Cart deleted because it is empty' });
         }
 
