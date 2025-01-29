@@ -1,5 +1,4 @@
-const { connectToDatabase } = require('./models/connection'); 
-connectToDatabase();
+require('./models/connection'); 
 
 const express = require('express');
 const path = require('path');
