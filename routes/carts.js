@@ -7,22 +7,22 @@ const { getHoursFromDate } = require('../modules/helpers');
 
 /** Middleware */
 
-function areFieldsExistForSave(req, res, next) {
-    const requiredFields = ['tripID', 'cartID'];
-    const errors = [];
+// function areFieldsExistForSave(req, res, next) {
+//     const requiredFields = ['tripID'];
+//     const errors = [];
 
-    requiredFields.forEach(field => {
-        if (!req.body[field]) {
-            errors.push({ [field]: `The field ${field} is required in body.` });
-        }
-    });
+//     requiredFields.forEach(field => {
+//         if (!req.body[field]) {
+//             errors.push({ [field]: `The field ${field} is required in body.` });
+//         }
+//     });
 
-    if (errors.length > 0) {
-        return res.status(400).json({ success: false, messages: errors });
-    }
+//     if (errors.length > 0) {
+//         return res.status(400).json({ success: false, messages: errors });
+//     }
 
-    next();
-}
+//     next();
+// }
 
 async function isCartExists(req, res, next) {
     if (!req.params.cartID) {
@@ -45,11 +45,7 @@ router.get('/', async (req, res, next) => {
     // const { cartID } = req.query;
 
     try {
-        // if (cartID === undefined) {
         const cart = await Cart.findOne({}).populate('trips').lean();
-        // } else {
-            // cart = await Cart.findById(cartID).populate('trips').lean();
-        // }
 
         if (cart === null) {
             return res.json({ result: false, cart: {} });
@@ -69,16 +65,14 @@ router.get('/', async (req, res, next) => {
 
 
 /** Route POST /save */
-router.post('/save', areFieldsExistForSave, async (req, res, next) => {
-    const { tripID, cartID } = req.body;
-    // const query = cartID !== '0' ? { _id: cartID } : {};
+router.post('/save', async (req, res, next) => {
+    const { tripID } = req.body;
+
+    if (!tripID) {
+        return res.status(400).json({ success: false, messages: `The field tripID is required in body.` });
+    }
 
     try {
-        // const cart = await Cart.findOneAndUpdate(
-        //     { $addToSet: { trips: tripID } },
-        //     { upsert: true, new: true }
-        // );
-
         const cart = await Cart.findOneAndUpdate(
             {},
             { $addToSet: { trips: tripID } },
