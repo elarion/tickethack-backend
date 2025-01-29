@@ -24,7 +24,7 @@ const validateSearchFields = (req, res, next) => {
 
     // If errors array is not empty, return the errors
     if (errors.length > 0) {
-        return res.status(400).json({ success: false, messages : errors });
+        return res.status(400).json({ result: false, messages : errors });
     }
 
     next();
