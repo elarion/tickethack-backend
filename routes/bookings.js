@@ -56,7 +56,7 @@ router.get('/', async (req, res, next) => {
             },
             // Unwind is used to deconstruct the trips array field from the previous stage
             // To get a flat array of all trips documents
-            { $unwind: "$trips" }, 
+            { $unwind: "$trips" },
             {
                 // Set is used to add new fields to the document
                 $set: {
@@ -101,9 +101,18 @@ router.get('/', async (req, res, next) => {
                     },
                     // Format the date to HH:MM
                     "trips.hours": {
-                        // $dateToString is used to format the date to a string
-                        $dateToString: { format: "%Hh%M", date: "$trips.date", timezone: "Europe/Paris" }
-                    }
+                        $cond: {
+                            if: {
+                                $or: [
+                                    { $lt: ["$trips.timeDiff", 0] },
+                                    { $gte: ["$trips.timeDiff", 24] }
+                                ]
+                            },
+
+                            then: { $dateToString: { format: "%m/%d/%Y %Hh%M", date: "$trips.date", timezone: "Europe/Paris" } },
+                            else: { $dateToString: { format: "%Hh%M", date: "$trips.date", timezone: "Europe/Paris" } }
+                        },
+                    },
                 }
             },
             // $replaceRoot is used to replace the root document with the trips document to avoid nested documents
