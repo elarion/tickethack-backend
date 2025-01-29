@@ -17,7 +17,7 @@ const validateSearchFields = (req, res, next) => {
     // Loop through required fields
     requiredFields.forEach(field => {
         // If the field is not in the request body, add an error message
-        if (!req.body[field]) {
+        if (!Object.hasOwn(req.body, field)) {
             errors.push({[field] : `The field ${field} is required in body.`});
         }
     });
