@@ -8,7 +8,7 @@ function getHoursFromDate(date) {
     date = moment(date);
 
     // If the date is the same as the current date, return the hours and minutes else return the full date
-    return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('DD MMMM YYYY HH[h]mm');
+    return date.isSame(now, 'day') ? moment(date).format('HH:mm') : date.format('MM/DD/YYYY HH[h]mm');
 }
 
 function formatDateForSearch(date) {
